@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>یه قرار؟</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        * { box-sizing: border-box; }
+        body {
+            margin: 0;
+            min-height: 100vh;
+            font-family: "Vazirmatn", sans-serif;
+            background: linear-gradient(135deg, #f7b2d8, #c9b6ff);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        .card {
+            width: 100%;
+            max-width: 520px;
+            background: rgba(255,255,255,0.88);
+            backdrop-filter: blur(12px);
+            border-radius: 25px;
+            padding: 30px 25px;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.12);
+            text-align: center;
+        }
+        .page { display: none; }
+        .page.active { display: block; }
+        h1 { font-size: 25px; margin-bottom: 25px; color: #333; }
+        .text { color: #444; font-size: 16px; line-height: 2.1; text-align: right; white-space: pre-line; }
+        button, .map-btn {
+            border: none;
+            border-radius: 14px;
+            padding: 13px 22px;
+            font-family: inherit;
+            font-size: 15px;
+            cursor: pointer;
+            transition: 0.25s;
+        }
+        .next-btn, .yes-btn { background: #d85b9c; color: white; }
+        .no-btn { background: #eee; color: #444; }
+        button:hover, .map-btn:hover { transform: translateY(-2px); }
+        #next1 { opacity: 0; pointer-events: none; margin-top: 25px; }
+        .buttons { display: flex; justify-content: center; gap: 15px; align-items: center; }
+        #yes, #no { transform: scale(1); }
+        .no-message { min-height: 25px; margin-top: 18px; color: #888; font-size: 14px; }
+        .date-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 18px;
+        }
+        .date-btn { background: #f2e7ee; color: #555; }
+        .date-btn.selected { background: #d85b9c; color: white; }
+        input {
+            width: 100%;
+            padding: 13px;
+            border: 1px solid #ddd;
+            border-radius: 12px;
+            font-family: inherit;
+            margin-bottom: 12px;
+            font-size: 15px;
+        }
+        .custom-date { display: none; }
+        .final-info { line-height: 2.2; color: #444; margin-bottom: 20px; }
+        .final-info strong { color: #333; }
+        .map-btn {
+            background: #333;
+            color: white;
+            margin-bottom: 25px;
+        }
+        .final-message { font-size: 16px; line-height: 2; color: #444; }
+        @media (max-width: 480px) {
+            .card { padding: 25px 18px; }
+            h1 { font-size: 22px; }
+            .text { font-size: 15px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="card">
+
+    <div class="page active" id="page1">
+        <h1>سلام aylin</h1>
+        <div class="text" id="introText"></div>
+        <button class="next-btn" id="next1">اگه خوندی، بزن بعدی</button>
+    </div>
+
+    <div class="page" id="page2">
+        <h1>خب، بریم بیرون؟</h1>
+        <div class="buttons">
+            <button class="yes-btn" id="yes">آره</button>
+            <button class="no-btn" id="no">نه</button>
+        </div>
+        <div class="no-message" id="noMessage"></div>
+    </div>
+
+    <div class="page" id="page3">
+        <h1>چه روز و ساعتی برات مناسبه؟</h1>
+        <div class="date-buttons">
+            <button class="date-btn" data-day="0">امروز</button>
+            <button class="date-btn" data-day="1">فردا</button>
+            <button class="date-btn" data-day="2">پس‌فردا</button>
+            <button class="date-btn" id="customBtn">انتخاب روز دیگه</button>
+        </div>
+        <div class="custom-date" id="customDate">
+            <input type="date" id="dateInput">
+        </div>
+        <input type="time" id="timeInput">
+        <button class="yes-btn" id="submitDate">ثبت زمان</button>
+    </div>
+
+    <div class="page" id="page4">
+        <h1>پس قرارمون شد</h1>
+        <div class="final-info">
+            <div><strong>تاریخ:</strong> <span id="finalDate"></span></div>
+            <div><strong>ساعت:</strong> <span id="finalTime"></span></div>
+            <div style="margin-top: 12px;"><strong>لوکیشن قرار</strong></div>
+        </div>
+
+        <a class="map-btn" href="https://maps.app.goo.gl/2shp2hvYDGRtJQpe6" target="_blank">
+            مشاهده روی نقشه
+        </a>
+
+        <div class="final-message">
+            اینجا می‌بینمت.<br>
+            اگه نمیای یا مشکلی پیش اومد، پیام بده.
+        </div>
+    </div>
+
+</div>
+
+<script>
+const intro = `راستش یه مدتیه می‌خواستم اینو بهت بگم، ولی هر بار یه چیزی باعث می‌شد شروعش نکنم.
+
+تقریباً از وقتی نت وصل شد، توی تیک‌تاک دیدمت و ازت خوشم اومد. بعدش هم کم‌کم کنجکاو شدم بیشتر بشناسمت؛ تا جایی که تقریباً هر روز چند بار پستات و ریپستات رو چک می‌کردم.
+
+یه‌سری مشکلات هم برام پیش اومد که باعث شد نتونم زودتر چیزی بگم و راستش هیچ‌وقت هم نمی‌دونستم دقیقاً چطوری شروع کنم.
+
+برای همین گفتم این بار ساده و مستقیم بگم:
+خوشحال می‌شم یه روز باهم بریم بیرون و یه قرار داشته باشیم.
+اگه تو هم موافقی، بزن بعدی.`;
+
+const introText = document.getElementById("introText");
+const next1 = document.getElementById("next1");
+
+let i = 0;
+
+function typeWriter() {
+    if (i < intro.length) {
+        introText.textContent += intro.charAt(i);
+        i++;
+        setTimeout(typeWriter, 18);
+    } else {
+        next1.style.opacity = "1";
+        next1.style.pointerEvents = "auto";
+    }
+}
+typeWriter();
+
+function showPage(number) {
+    document.querySelectorAll(".page").forEach(page => {
+        page.classList.remove("active");
+    });
+    document.getElementById("page" + number).classList.add("active");
+}
+
+next1.addEventListener("click", () => showPage(2));
+
+const yes = document.getElementById("yes");
+const no = document.getElementById("no");
+const noMessage = document.getElementById("noMessage");
+
+let noClicks = 0;
+
+const messages = [
+    "مطمئنی؟",
+    "یه بار دیگه فکر کن.",
+    "شاید آره بهتر باشه.",
+    "آخرین فرصت برای تغییر نظرت."
+];
+
+yes.addEventListener("click", () => showPage(3));
+
+no.addEventListener("click", () => {
+    noClicks++;
+    let noScale = Math.max(0.35, 1 - noClicks * 0.13);
+    let yesScale = Math.min(1.85, 1 + noClicks * 0.16);
+
+    no.style.transform = `scale(${noScale})`;
+    yes.style.transform = `scale(${yesScale})`;
+
+    noMessage.textContent =
+        messages[Math.min(noClicks - 1, messages.length - 1)];
+});
+
+const dateButtons = document.querySelectorAll(".date-btn");
+const customBtn = document.getElementById("customBtn");
+const customDate = document.getElementById("customDate");
+const dateInput = document.getElementById("dateInput");
+
+let selectedDate = null;
+
+dateButtons.forEach(button => {
+    button.addEventListener("click", () => {
+        dateButtons.forEach(btn => btn.classList.remove("selected"));
+        button.classList.add("selected");
+
+        let day = button.dataset.day;
+
+        if (day !== undefined) {
+            customDate.style.display = "none";
+            let date = new Date();
+            date.setDate(date.getDate() + Number(day));
+            selectedDate = date;
+        }
+    });
+});
+
+customBtn.addEventListener("click", () => {
+    dateButtons.forEach(btn => btn.classList.remove("selected"));
+    customBtn.classList.add("selected");
+    customDate.style.display = "block";
+});
+
+dateInput.addEventListener("change", () => {
+    if (dateInput.value) {
+        const parts = dateInput.value.split("-");
+        selectedDate = new Date(
+            Number(parts[0]),
+            Number(parts[1]) - 1,
+            Number(parts[2])
+        );
+    }
+});
+
+function toJalali(gy, gm, gd) {
+    let g_d_m = [0,31,59,90,120,151,181,212,243,273,304,334];
+    let jy;
+
+    if (gy > 1600) {
+        jy = 979;
+        gy -= 1600;
+    } else {
+        jy = 0;
+        gy -= 621;
+    }
+
+    let gy2 = (gm > 2) ? gy + 1 : gy;
+
+    let days =
+        (365 * gy) +
+        Math.floor((gy2 + 3) / 4) -
+        Math.floor((gy2 + 99) / 100) +
+        Math.floor((gy2 + 399) / 400) -
+        80 +
+        gd +
+        g_d_m[gm - 1];
+
+    jy += 33 * Math.floor(days / 12053);
+    days %= 12053;
+
+    jy += 4 * Math.floor(days / 1461);
+    days %= 1461;
+
+    if (days > 365) {
+        jy += Math.floor((days - 1) / 365);
+        days = (days - 1) % 365;
+    }
+
+    let jm;
+    if (days < 186) {
+        jm = 1 + Math.floor(days / 31);
+    } else {
+        jm = 7 + Math.floor((days - 186) / 30);
+    }
+
+    let jd;
+    if (days < 186) {
+        jd = 1 + (days % 31);
+    } else {
+        jd = 1 + ((days - 186) % 30);
+    }
+
+    return [jy, jm, jd];
+}
+
+document.getElementById("submitDate").addEventListener("click", () => {
+    const time = document.getElementById("timeInput").value;
+
+    if (!selectedDate) {
+        alert("لطفاً یک روز انتخاب کن.");
+        return;
+    }
+
+    if (!time) {
+        alert("لطفاً ساعت رو انتخاب کن.");
+        return;
+    }
+
+    const jalali = toJalali(
+        selectedDate.getFullYear(),
+        selectedDate.getMonth() + 1,
+        selectedDate.getDate()
+    );
+
+    const finalDate =
+        `${jalali[0]}/${String(jalali[1]).padStart(2, "0")}/${String(jalali[2]).padStart(2, "0")}`;
+
+    document.getElementById("finalDate").textContent = finalDate;
+    document.getElementById("finalTime").textContent = time;
+
+    localStorage.setItem("selectedDate", finalDate);
+    localStorage.setItem("selectedTime", time);
+
+    showPage(4);
+});
+</script>
+
+</body>
+</html>
