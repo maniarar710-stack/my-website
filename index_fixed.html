@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>یه قرار؟</title>
+<link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box}
+body{
+  margin:0; min-height:100vh; padding:20px;
+  font-family:"Vazirmatn",sans-serif;
+  background:linear-gradient(135deg,#f7b2d8,#c9b6ff);
+  display:flex; justify-content:center; align-items:center;
+}
+.card{
+  width:100%; max-width:520px; padding:30px 25px;
+  background:rgba(255,255,255,.9); border-radius:25px;
+  box-shadow:0 15px 40px rgba(0,0,0,.12);
+  text-align:center;
+}
+.page{display:none}.page.active{display:block}
+h1{font-size:25px;margin:0 0 25px;color:#333}
+.text{color:#444;font-size:16px;line-height:2.1;text-align:right;white-space:pre-line}
+button,.map-btn{
+  border:0;border-radius:14px;padding:13px 22px;
+  font-family:inherit;font-size:15px;cursor:pointer;transition:.25s;
+}
+button:hover,.map-btn:hover{transform:translateY(-2px)}
+.next-btn,.yes-btn{background:#d85b9c;color:#fff}
+.no-btn{background:#eee;color:#444}
+#next1{opacity:0;pointer-events:none;margin-top:25px}
+.buttons{display:flex;justify-content:center;gap:15px;align-items:center}
+#yes,#no{transform:scale(1)}
+.no-message{min-height:25px;margin-top:18px;color:#888;font-size:14px}
+
+.date-title{color:#555;margin-bottom:10px}
+.date-selects{display:grid;grid-template-columns:1fr 1.4fr 1fr;gap:8px;margin-bottom:18px}
+select,input{
+  width:100%;padding:13px;border:1px solid #ddd;border-radius:12px;
+  font-family:inherit;font-size:15px;background:#fff;
+}
+.time-label{display:block;color:#555;margin-bottom:8px}
+input[type="time"]{margin-bottom:15px}
+
+.map-btn{
+  display:inline-block;background:#333;color:#fff;text-decoration:none;
+  margin-top:15px;margin-bottom:22px;
+}
+.final-info{line-height:2.2;color:#444;margin-bottom:0}
+.final-message{font-size:16px;line-height:2;color:#444}
+.final-meet{font-size:18px;font-weight:600;color:#333;margin-top:18px}
+
+@media(max-width:480px){
+  .card{padding:25px 18px} h1{font-size:22px}.text{font-size:15px}
+}
+</style>
+</head>
+<body>
+<div class="card">
+
+  <div class="page active" id="page1">
+    <h1>سلام aylin</h1>
+    <div class="text" id="introText"></div>
+    <button class="next-btn" id="next1">اگه خوندی، بزن بعدی</button>
+  </div>
+
+  <div class="page" id="page2">
+    <h1>خب، بریم بیرون؟</h1>
+    <div class="buttons">
+      <button class="yes-btn" id="yes">آره</button>
+      <button class="no-btn" id="no">نه</button>
+    </div>
+    <div class="no-message" id="noMessage"></div>
+  </div>
+
+  <div class="page" id="page3">
+    <h1>چه روز و ساعتی برات مناسبه؟</h1>
+
+    <div class="date-title">انتخاب تاریخ شمسی</div>
+    <div class="date-selects">
+      <select id="yearSelect" aria-label="سال"></select>
+      <select id="monthSelect" aria-label="ماه"></select>
+      <select id="daySelect" aria-label="روز"></select>
+    </div>
+
+    <label class="time-label" for="timeInput">انتخاب ساعت</label>
+    <input type="time" id="timeInput" value="18:30">
+
+    <button class="yes-btn" id="submitDate">ثبت</button>
+  </div>
+
+  <div class="page" id="page4">
+    <h1>قرارمون شد</h1>
+
+    <div class="final-info">
+      <div><strong>تاریخ:</strong> <span id="finalDate">۱۴۰۵/۰۶/۲۰</span></div>
+      <div><strong>ساعت:</strong> <span id="finalTime">۱۸:۳۰</span></div>
+    </div>
+
+    <div class="final-meet">اینجا می‌بینمت.</div>
+
+    <a class="map-btn" href="https://maps.app.goo.gl/2shp2hvYDGRtJQpe6" target="_blank" rel="noopener">
+      مشاهده لوکیشن روی نقشه
+    </a>
+
+    <div class="final-message">اگه نمیای یا مشکلی پیش اومد، پیام بده.</div>
+  </div>
+
+</div>
+
+<script>
+const intro = `راستش یه مدتیه می‌خواستم اینو بهت بگم، ولی هر بار یه چیزی باعث می‌شد شروعش نکنم.
+
+تقریباً از وقتی نت وصل شد، توی تیک‌تاک دیدمت و ازت خوشم اومد. بعدش هم کم‌کم کنجکاو شدم بیشتر بشناسمت؛ تا جایی که تقریباً هر روز چند بار پستات و ریپستات رو چک می‌کردم.
+
+یه‌سری مشکلات هم برام پیش اومد که باعث شد نتونم زودتر چیزی بگم و راستش هیچ‌وقت هم نمی‌دونستم دقیقاً چطوری شروع کنم.
+
+برای همین گفتم این بار ساده و مستقیم بگم:
+خوشحال می‌شم یه روز باهم بریم بیرون و یه قرار داشته باشیم.
+اگه تو هم موافقی، بزن بعدی.`;
+
+const introText=document.getElementById("introText");
+const next1=document.getElementById("next1");
+let i=0;
+
+function typeWriter(){
+  if(i<intro.length){
+    introText.textContent+=intro.charAt(i++);
+    setTimeout(typeWriter,18);
+  }else{
+    next1.style.opacity="1";
+    next1.style.pointerEvents="auto";
+  }
+}
+typeWriter();
+
+function showPage(n){
+  document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
+  document.getElementById("page"+n).classList.add("active");
+}
+next1.addEventListener("click",()=>showPage(2));
+
+const yes=document.getElementById("yes");
+const no=document.getElementById("no");
+const noMessage=document.getElementById("noMessage");
+let noClicks=0;
+const messages=["مطمئنی؟","یه بار دیگه فکر کن.","شاید آره بهتر باشه.","آخرین فرصت برای تغییر نظرت."];
+
+yes.addEventListener("click",()=>showPage(3));
+no.addEventListener("click",()=>{
+  noClicks++;
+  no.style.transform=`scale(${Math.max(.35,1-noClicks*.13)})`;
+  yes.style.transform=`scale(${Math.min(1.85,1+noClicks*.16)})`;
+  noMessage.textContent=messages[Math.min(noClicks-1,messages.length-1)];
+});
+
+const years=document.getElementById("yearSelect");
+const months=document.getElementById("monthSelect");
+const days=document.getElementById("daySelect");
+const monthNames=["فروردین","اردیبهشت","خرداد","تیر","مرداد","شهریور","مهر","آبان","آذر","دی","بهمن","اسفند"];
+
+function fa(n){return String(n).replace(/\d/g,d=>"۰۱۲۳۴۵۶۷۸۹"[d])}
+function fillOptions(){
+  for(let y=1405;y<=1410;y++) years.add(new Option(fa(y),y));
+  monthNames.forEach((m,i)=>months.add(new Option(m,i+1)));
+  updateDays();
+  years.value="1405"; months.value="6"; days.value="20";
+}
+function updateDays(){
+  const m=Number(months.value);
+  const max=m<=6?31:(m<=11?30:30);
+  const old=Number(days.value)||20;
+  days.innerHTML="";
+  for(let d=1;d<=max;d++) days.add(new Option(fa(d),d));
+  days.value=String(Math.min(old,max));
+}
+months.addEventListener("change",updateDays);
+fillOptions();
+
+document.getElementById("submitDate").addEventListener("click",()=>{
+  const y=Number(years.value), m=Number(months.value), d=Number(days.value);
+  const time=document.getElementById("timeInput").value;
+  if(!time){alert("لطفاً ساعت رو انتخاب کن.");return;}
+
+  const finalDate=`${y}/${String(m).padStart(2,"0")}/${String(d).padStart(2,"0")}`;
+  document.getElementById("finalDate").textContent=fa(finalDate);
+  document.getElementById("finalTime").textContent=fa(time);
+
+  localStorage.setItem("selectedDate",finalDate);
+  localStorage.setItem("selectedTime",time);
+  showPage(4);
+});
+</script>
+</body>
+</html>
